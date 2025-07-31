@@ -2,9 +2,6 @@ import os
 
 import telebot
 import  certifi
-os.environ['SSL_CERT_FILE'] = certifi.where()
-
-
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
