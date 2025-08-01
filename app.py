@@ -27,9 +27,6 @@ bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 def send_welcome(message):
     bot.reply_to(message, "Howdy, how are you doing?")
 
-@bot.message_handler(func=lambda msg: True)
-def echo_all(message):
-    bot.reply_to(message, message.text)
 
 # ------------------------------------------------------------------
 # Databricks reporting
@@ -101,13 +98,13 @@ def handle_repair_choice(call):
 
     # get job name from the run
     run_info = w.jobs.get_run(run_id)
-    job_name = run_info.job.settings.name
+    #job_name = run_info.job.settings.name
 
     w.jobs.repair_run(run_id, rerun_all_failed_tasks=True)
     bot.answer_callback_query(call.id, "Repair triggered ✅")
     bot.send_message(
         CHAT_ID,
-        f"Started repair for job *{job_name}*  (run_id={run_id})",
+        f"Started repair for job  (run_id={run_id})",
         parse_mode="Markdown"
     )
 
@@ -115,7 +112,7 @@ def handle_repair_choice(call):
 # ------------------------------------------------------------------
 # Schedule
 # ------------------------------------------------------------------
-for t in ("09:00", "12:00", "15:00", "18:37"):
+for t in ("09:00", "12:00", "15:00", "18:42"):
     schedule.every().day.at(t).do(databricks_job_notification)
 
 if __name__ == "__main__":
