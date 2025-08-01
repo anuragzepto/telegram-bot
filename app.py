@@ -96,23 +96,33 @@ def handle_repair_choice(call):
         token=os.environ["DATABRICKS_TOKEN"],
     )
 
-    # get job name from the run
+    # fetch run details to get the job name
     run_info = w.jobs.get_run(run_id)
     #job_name = run_info.job.settings.name
+    print(run_info)
+    # determine the latest repair attempt id
+    latest_repair_id = 0
+    if run_info.repair_history and run_info.repair_history.repair_history:
+        # the list is ordered newest-first
+        latest_repair_id = run_info.repair_history.repair_history[0].id
 
-    w.jobs.repair_run(run_id, rerun_all_failed_tasks=True)
+    w.jobs.repair_run(
+        run_id,
+        latest_repair_id=latest_repair_id,
+        rerun_all_failed_tasks=True
+    )
+
     bot.answer_callback_query(call.id, "Repair triggered ✅")
     bot.send_message(
         CHAT_ID,
-        f"Started repair for job  (run_id={run_id})",
+        f"Started repair for job (run_id={run_id})",
         parse_mode="Markdown"
     )
-
 
 # ------------------------------------------------------------------
 # Schedule
 # ------------------------------------------------------------------
-for t in ("09:00", "12:00", "15:00", "18:42"):
+for t in ("09:00", "12:00", "15:00", "18:48"):
     schedule.every().day.at(t).do(databricks_job_notification)
 
 if __name__ == "__main__":
