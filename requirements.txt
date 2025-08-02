@@ -1,6 +1,7 @@
-telebot
-python-dotenv
-databricks-sdk
-schedule
-requests
 certifi
+pytz
+requests
+schedule
+telebot
+databricks-sdk
+python-dotenv
