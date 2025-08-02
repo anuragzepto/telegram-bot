@@ -310,23 +310,32 @@ def repair_databricks_job(run_id):
     except Exception as e:
         bot.send_message(CHAT_ID, f"❌ Repair failed: {e}")
 
-# ------------------------------------------------------------------
-# Scheduler
-# ------------------------------------------------------------------
-times = ("07:45","08:30","09:30","11:00","12:00","13:00","15:00","18:00","20:00","23:30")
+
+times = ("07:45", "08:30", "09:30", "11:00", "12:00",
+         "13:00", "15:00", "18:00", "20:20", "23:30")
+
 for t in times:
     schedule.every().day.at(t).do(databricks_job_notification)
 
-# ------------------------------------------------------------------
-# Entry-point
-# ------------------------------------------------------------------
+
+
+
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
     )
-    databricks_job_notification()  # first run
+
+    # First run
+    databricks_job_notification()
+
+    # Start Telegram polling in a daemon thread
+    polling_thread = threading.Thread(
+        target=bot.polling, kwargs={"none_stop": True}, daemon=True
+    )
+    polling_thread.start()
+
+    # Main loop for the scheduler
     while True:
         schedule.run_pending()
-        bot.polling(none_stop=True)
         time.sleep(1)
